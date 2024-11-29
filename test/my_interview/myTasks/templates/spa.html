@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tasks SPA</title>
+</head>
+
+{% load static %}
+<link rel="stylesheet" href="{% static 'myTasks/custom.css' %}">
+
+<body class="form-control">
+    
+<h1 style="text-align: center;">MANUEL GONZÁLEZ VARELA - Tasks Interview</h1>
+
+<div class="container" style="text-align: center;">
+<div class="form-control">
+    <form action="" method="POST">
+         {% csrf_token %}
+        <label for="title">Enter Title:</label>
+        <input type="text" placeholder="Title" id="Title" name="Title">
+        <hr>
+        <label for="description">Enter Description:</label>
+        <textarea type="text" placeholder="Description" id="Description" name="Description"></textarea>
+        <hr>
+        <label for="status">Enter Status:</label>
+        <select id="status" name="status">
+            <option value="" disabled selected>Select an option</option>
+            <option value="Pending">Pending</option>
+            <option value="Completed">Completed</option>
+        </select>        
+        <hr>
+        <button type="submit" id="insertBTN" onclick="add(event)" value="insertBTN" name="insertBTN">Insert</button>
+
+        <script>
+            function add(event){
+                let title = document.getElementById('Title').value;
+                let description = document.getElementById('Description').value;
+                let status = document.getElementById('status').value;
+                if (title.trim() === "" || description.trim() === "" || status.trim() === ""){
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Oops',
+                        text: 'Empty fields',
+                        footer: 'Enter valid values'
+                    });
+                    event.preventDefault();
+                }
+            };
+        </script>
+
+
+    </form>
+</div>
+</div>
+
+
+<div class="container" style="width: 100%;">
+    <table class="table" style="border: rgb(47, 47, 47) solid; width: 100%;">
+    <tbody>
+                <tr>
+            <th class="radial-gradient" style="width:auto; background-color: black;color:white">
+                      Title:
+            </th>
+            <th class="radial-gradient" style="width:auto; background-color: black;color:white">
+                    Description:
+            </th>
+            <th class="radial-gradient" style="width:auto; background-color: black;color:white">
+                Status:
+        </th>
+        <th class="radial-gradient" style="width:auto; background-color: black;color:white">
+            Action:
+    </th>
+                </tr>   
+                
+                    {%for key,value in tasks.items %}
+
+                    <tr>
+                            <td style="background-color: black; font-size: small;  color:white"> 
+                            {{value.title}}
+                            </td>
+                            <td style="background-color: black; font-size: small; color:white"> 
+                            {{value.description}}
+                            </td>
+                            <td style="background-color: black; font-size: small; color:white"> 
+                                {{value.status}}
+                            </td>
+
+                            <form action="" method="POST">
+
+                            <td style="background-color: black; font-size: small; color:white"> 
+                                    {% csrf_token %}  
+                                    <button type="submit" name="deletebtn" id="deletebtn" value="{{value.pk}}"> Delete </button>
+                                    <button type="button" name="updatebtn" id="myBtn_{{value.pk}}" > Update </button>
+
+                            </td>
+                        </form>
+
+                    </tr>
+
+                                  <!-- The Modal -->
+              <div id="myModal_{{value.pk}}" class="modal">
+                <!-- Modal content -->
+                <div class="modal-content" style="display: flex; justify-content: center; align-items: center; width: auto; height: auto">
+                  <span class="close">&times;</span>
+         
+                  <form action="" method="POST" style="text-align: start;">
+                    {% csrf_token %}
+                    <div class="modal modal-sheet position-static d-block bg-body-secondary p-4 py-md-5" tabindex="-1" role="dialog" id="modalSheet">
+
+                          <div class="modal-header border-bottom-0" style="width: 100%;">
+                            <textarea class="form-control inputbox" style="resize: none; width:100%; height: auto;" name="edittitle" value="{{ value.title }}">{{ value.title }}</textarea>
+                          </div>
+                          <div class="modal-body py-0" style="resize: none; width:100%; height: 400px;">
+                            <textarea class="form-control inputbox" style="resize: none; width:100%; height: 100%;" name="editdesc" value="{{ value.description }}">{{ value.description }}</textarea>
+                          </div>
+                          <hr>
+                          <div class="modal-body py-0" style="width:auto; height: auto;">        
+                            <select class="modal-body py-0" style="width:100%; height: auto;" id="status" name="status">
+                            <option value="Pending">Pending</option>
+                            <option value="Completed">Completed</option>
+                            </select>  
+                        </div>
+                          <div class="modal-footer flex-column align-items-stretch w-100 gap-2 pb-3 border-top-0">
+                            <button class="btn btn-lg btn-success" style="width: 60px; margin-bottom:20px" type="submit" name="editbtn" value="{{value.pk}}">
+                              <i class='fa fa-edit' style="font-size: 24px;"></i></button>
+                          </div>
+                    </div>
+                  </form>
+                </div>
+              </div> 
+                    {%endfor%}                   
+    </tbody> 
+    </table>       
+    </div>
+
+    <script>
+
+        // Get all the buttons and modals
+        var buttons = document.querySelectorAll('[id^="myBtn_"]');
+        var modals = document.querySelectorAll('[id^="myModal_"]');
+        // Assign event handlers to each button and modal
+
+        buttons.forEach(function(button) {
+
+            var modalId = button.id.replace("myBtn_", "");
+            var modal = document.getElementById("myModal_" + modalId);
+            var span = modal.getElementsByClassName("close")[0];
+            button.onclick = function() {
+                modal.style.display = "block";
+            }
+            span.onclick = function() {
+                modal.style.display = "none";
+            }
+        });
+        // Attach the window.onclick event handler
+        window.onclick = function(event) {
+            modals.forEach(function(modal) {
+                if (event.target == modal) {
+                    modal.style.display = "none";
+                }
+            });
+        };
+</script>
+
+</body>
+</html>
